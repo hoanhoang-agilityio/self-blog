@@ -1,4 +1,4 @@
-import 'tailwindcss/tailwind.css';
+import './global.css';
 
 export default function Home() {
   return <div>Hello</div>;

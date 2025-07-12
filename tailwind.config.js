@@ -8,4 +8,9 @@ module.exports = {
     extend: {},
   },
   plugins: [],
+  content: [
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+    './pages/**/*.{js,ts,jsx,tsx}', // if using legacy pages
+  ],
 };
