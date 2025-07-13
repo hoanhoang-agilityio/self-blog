@@ -3,6 +3,10 @@ import { cookies } from 'next/headers';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 
+import { auth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import { ADMIN_ROUTES } from '@/constants/routers';
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -10,6 +14,10 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get('sidebar_state')?.value === 'true';
+
+  const session = await auth();
+
+  if (!session) redirect(ADMIN_ROUTES.LOGIN.URL);
 
   return (
     <section>

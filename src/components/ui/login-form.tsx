@@ -1,24 +1,49 @@
 'use client';
 
-import { useActionState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Button } from './button';
+import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { ArrowRightIcon } from 'lucide-react';
-import { handleLogin } from '@/actions/apis';
+import { Button } from './button';
 
 export default function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/users';
 
-  const [errorMessage, formAction, isPending] = useActionState(handleLogin, undefined);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsPending(true);
+    setErrorMessage(null);
+
+    const res = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
+      callbackUrl,
+    });
+
+    if (res?.ok) {
+      router.push(res.url ?? callbackUrl);
+    } else {
+      setErrorMessage('Invalid email or password');
+    }
+
+    setIsPending(false);
+  };
 
   return (
-    <form action={formAction} className="space-y-3">
+    <form onSubmit={handleSubmit} className="space-y-3">
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pt-8 pb-4">
         <h1 className="mb-3 text-2xl">Please log in to continue.</h1>
         <div className="w-full">
           <div>
-            <label className="mt-5 mb-3 block text-xs font-medium text-gray-900" htmlFor="email">
+            <label htmlFor="email" className="mt-5 mb-3 block text-xs font-medium text-gray-900">
               Email
             </label>
             <div className="relative">
@@ -27,13 +52,16 @@ export default function LoginForm() {
                 id="email"
                 type="email"
                 name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
                 required
               />
             </div>
           </div>
+
           <div className="mt-4">
-            <label className="mt-5 mb-3 block text-xs font-medium text-gray-900" htmlFor="password">
+            <label htmlFor="password" className="mt-5 mb-3 block text-xs font-medium text-gray-900">
               Password
             </label>
             <div className="relative">
@@ -42,6 +70,8 @@ export default function LoginForm() {
                 id="password"
                 type="password"
                 name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
                 required
                 minLength={6}
@@ -50,10 +80,7 @@ export default function LoginForm() {
           </div>
         </div>
 
-        {/* Pass the callback URL in hidden input */}
-        <input type="hidden" name="redirectTo" value={callbackUrl} />
-
-        <Button className="mt-4 w-full" aria-disabled={isPending}>
+        <Button type="submit" className="mt-4 w-full" aria-disabled={isPending}>
           Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
         </Button>
 

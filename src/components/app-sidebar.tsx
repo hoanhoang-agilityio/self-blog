@@ -25,6 +25,8 @@ import {
 import { ChevronUp, User2 } from 'lucide-react';
 import { Button } from './ui/button';
 
+import { signOut } from 'next-auth/react';
+
 export function AppSidebar() {
   const pathname = usePathname();
 
@@ -64,7 +66,7 @@ export function AppSidebar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
                 <DropdownMenuItem>
-                  <Button>Sign out</Button>
+                  <Button onClick={() => signOut()}>Sign out</Button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
