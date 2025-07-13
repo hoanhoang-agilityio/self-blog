@@ -12,16 +12,14 @@ export default async function RootLayout({
   const defaultOpen = cookieStore.get('sidebar_state')?.value === 'true';
 
   return (
-    <html lang="en">
-      <body>
-        <SidebarProvider defaultOpen={defaultOpen}>
-          <AppSidebar />
-          <SidebarInset>
-            <SidebarTrigger />
-            <main className="p-20">{children}</main>
-          </SidebarInset>
-        </SidebarProvider>
-      </body>
-    </html>
+    <section>
+      <SidebarProvider defaultOpen={defaultOpen}>
+        <AppSidebar />
+        <SidebarInset>
+          <SidebarTrigger />
+          <main className="p-20">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
+    </section>
   );
 }

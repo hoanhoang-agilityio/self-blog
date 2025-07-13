@@ -4,30 +4,13 @@ import { useActionState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from './button';
 import { ArrowRightIcon } from 'lucide-react';
-
-const authenticate = async (prevState: unknown, formData: FormData) => {
-  // example validation
-  const email = formData.get('email')?.toString();
-  const password = formData.get('password')?.toString();
-
-  if (!email || !password) {
-    return 'Email and password are required.';
-  }
-
-  // You would usually do authentication here
-  const success = email === 'admin@example.com' && password === 'admin123';
-  if (!success) {
-    return 'Invalid credentials.';
-  }
-
-  // If success, perform redirect or further logic (no error)
-  return undefined;
-};
+import { handleLogin } from '@/actions/apis';
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-  const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
+  const callbackUrl = searchParams.get('callbackUrl') || '/users';
+
+  const [errorMessage, formAction, isPending] = useActionState(handleLogin, undefined);
 
   return (
     <form action={formAction} className="space-y-3">
@@ -66,10 +49,14 @@ export default function LoginForm() {
             </div>
           </div>
         </div>
+
+        {/* Pass the callback URL in hidden input */}
         <input type="hidden" name="redirectTo" value={callbackUrl} />
+
         <Button className="mt-4 w-full" aria-disabled={isPending}>
           Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
         </Button>
+
         <div className="flex h-8 items-end space-x-1" aria-live="polite" aria-atomic="true">
           {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
         </div>
